@@ -36,6 +36,12 @@ loopThruAlphabet <- function(urlString){
         # some entries in the html file are empty and should be removed
         ind <- which(nchar(tmp)==1)
         if (length(ind)!=0){tmp <- tmp[-ind]}
+        # names that begin with letter A can be written differently
+        if (alphabet[i] == "A"){            
+            s <- substring(tmp,2,nchar(tmp))
+            s <- paste0("ا",s)
+            tmp <- c(tmp,s)
+        }
         # concatenate the names from the current letter to the main list
         Parse <- c(Parse,tmp)
     }
