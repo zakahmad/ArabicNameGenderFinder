@@ -41,6 +41,13 @@ loopThruAlphabet <- function(urlString){
     }
     return(unlist(Parse))
 }
+# get list of feminine names
+fList <- loopThruAlphabet("/ar_html_files/first_name_girls_")
+# create a dataframe from the list
+fDF <- data.frame(fList,"Female")
+# rename columns to a more descriptive name
+colnames(fDF) <- c("Name","Gender")
+
 # get list of masculine names
 mList <- loopThruAlphabet("/ar_html_files/first_name_boys_")
 # create a dataframe from the list
@@ -48,12 +55,20 @@ mDF <- data.frame(mList,"Male")
 # rename columns to a more descriptive name
 colnames(mDF) <- c("Name","Gender")
 
-# get list of feminine names
-fList <- loopThruAlphabet("/ar_html_files/first_name_girls_")
-# create a dataframe from the list
-fDF <- data.frame(fList,"Female")
-# rename columns to a more descriptive name
-colnames(fDF) <- c("Name","Gender")
+# scrape masculine names from this link
+URL <- "http://www.childclinic.net/names/child_names_god.html"
+# extract only the names which have font color #0000FF
+mNames <- unlist(xpathApply(htmlTreeParse(URL,useInternalNodes=T), path="//font[@color='#0000FF']",fun=xmlValue,encoding="UTF-8"))
+# drop first entry (its just a column title not a name)
+mNames <- mNames[-1]
+# remove spaces and other characters
+mNames <- gsub("\n","",mNames)
+mNames <- gsub("\r","",mNames)
+mNames <- gsub(" ","",mNames)
+# append names to dataframe
+mDF <- rbind(mDF,data.frame(Name=mNames,Gender="Male"))
+# re-order (sort) dataframe alphabetically by name
+mDF <- mDF[order(as.character(mDF$Name)),]
 
 # write the dataframes to csv files
 mFile <- "males_ar.csv"
